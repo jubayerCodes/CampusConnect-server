@@ -44,7 +44,10 @@ async function run() {
 
     app.post("/admission", async (req, res) => {
       const data = req.body
-      console.log(data);
+
+      const result = await admissionCollection.insertOne(data)
+
+      return res.json(result)
     })
 
 
