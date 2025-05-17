@@ -4,6 +4,8 @@ const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config()
 const app = express()
 const port = 3000
+app.use(express.json());
+
 app.use(cors());
 
 
@@ -31,14 +33,14 @@ async function run() {
     app.get('/colleges', async (req, res) => {
       const colleges = await collegeCollection.find().toArray()
 
-      return res.json(colleges)
+      res.json(colleges)
     })
 
     app.get('/colleges/:id', async (req, res) => {
       const id = req?.params?.id
       const college = await collegeCollection.findOne({ _id: new ObjectId(id) })
 
-      return res.json(college)
+      res.json(college)
     })
 
 
@@ -47,7 +49,9 @@ async function run() {
 
       const result = await admissionCollection.insertOne(data)
 
-      return res.json(result)
+      console.log(result);
+
+      res.json(result)
     })
 
 
