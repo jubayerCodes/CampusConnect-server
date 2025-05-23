@@ -61,6 +61,21 @@ async function run() {
     })
 
 
+    app.get('/my-college/:email', async (req, res) => {
+      const email = req.params.email
+
+      const admission = await admissionCollection.findOne({ email })
+
+      if (!admission?._id) {
+        return res.json({})
+      }
+
+      const collegeId = await admission?.collegeId
+
+      const myCollege = await collegeCollection.findOne({ _id: new ObjectId(collegeId) })
+
+      res.json(myCollege)
+    })
 
 
 
