@@ -10,7 +10,7 @@ app.use(cors());
 
 
 // MongoDB connection
-const uri = process.env.MONGODB_URI;
+const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASS}@cluster0.opkciwj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
   serverApi: {
@@ -22,7 +22,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    client.connect();
 
     const CampusConnectDB = client.db("CampusConnectDB");
     const collegeCollection = CampusConnectDB.collection("colleges")
@@ -47,9 +47,15 @@ async function run() {
     app.post("/admission", async (req, res) => {
       const data = req.body
 
-      const result = await admissionCollection.insertOne(data)
+      const email = data?.email
 
-      console.log(result);
+      const existingAdmission = await admissionCollection.findOne({ email })
+
+      if (existingAdmission) {
+        return res.json({ existing: true, acknowledged: true })
+      }
+
+      const result = await admissionCollection.insertOne(data)
 
       res.json(result)
     })
