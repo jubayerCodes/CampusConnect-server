@@ -27,6 +27,8 @@ async function run() {
     const CampusConnectDB = client.db("CampusConnectDB");
     const collegeCollection = CampusConnectDB.collection("colleges")
     const admissionCollection = CampusConnectDB.collection("admissions")
+    const reviewCollection = CampusConnectDB.collection("reviews")
+    const userCollection = CampusConnectDB.collection("users")
 
 
 
@@ -74,7 +76,49 @@ async function run() {
 
       const myCollege = await collegeCollection.findOne({ _id: new ObjectId(collegeId) })
 
-      res.json(myCollege)
+
+      const result = {
+        ...myCollege,
+        candidateName: admission?.fullName,
+        candidateImage: admission?.image
+      }
+
+      res.json(result)
+    })
+
+
+    app.post('/review', async (req, res) => {
+      const data = req.body
+      const existingReview = await reviewCollection.findOne({ email: data?.email, collegeId: data?.collegeId })
+
+
+      if (existingReview) {
+        return res.json({ existing: true, acknowledged: true })
+      }
+
+      const result = await reviewCollection.insertOne(data)
+      res.json(result)
+    })
+
+
+    app.get('/reviews', async (req, res) => {
+      const result = await reviewCollection?.find().toArray()
+
+      res.json(result)
+    })
+
+
+    app.post('/user', async (req, res) => {
+      const data = req.body
+
+      const existingUser = await userCollection.findOne({ email: data?.email })
+
+      if (existingUser) {
+        return res.json({ existing: true, acknowledged: true })
+      }
+
+      const result = await userCollection.insertOne(data)
+      res.json(result)
     })
 
 
