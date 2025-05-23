@@ -121,6 +121,32 @@ async function run() {
       res.json(result)
     })
 
+    app.get('/user/:email', async (req, res) => {
+      const email = req.params.email
+
+      const result = await userCollection.findOne({ email })
+      res.json(result)
+    })
+
+
+    app.patch('/user/:email', async (req, res) => {
+      const email = req.params.email
+      const data = req.body
+
+      const existingUser = await userCollection.findOne({ email })
+
+      if (!existingUser) {
+        return res.json({ existing: false })
+      }
+
+      const result = await userCollection.updateOne({ email }, {
+        $set: data
+      })
+
+      res.json(result)
+
+    })
+
 
 
     // Send a ping to confirm a successful connection
